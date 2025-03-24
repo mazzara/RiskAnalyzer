@@ -1,0 +1,57 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment folders (in case you create one here)
+venv/
+.env/
+env/
+
+# Jupyter Notebook checkpoints (if you ever use notebooks)
+.ipynb_checkpoints/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Logs and debugging
+*.log
+*.tmp
+
+# Sensitive files (credentials, API keys, etc.)
+*.env
+*.secret
+
+# Data files (raw, processed, exports)
+*.csv
+*.xlsx
+*.xls
+*.json
+*.h5
+*.pkl
+
+# Reports and output files
+/reports/
+/*.pdf
+/*.md
+
+# Figures or plots
+*.png
+*.jpg
+*.jpeg
+*.svg
+
+# Build / dist
+build/
+dist/
+*.egg-info/
+
+# VSCode or PyCharm settings (optional)
+.vscode/
+.idea/
+
+# Mac folder metadata (redundant but safe)
+.Spotlight-V100
+.Trashes
+
