@@ -1,4 +1,4 @@
-# ./OilAnalyzer/volatility_regimes.py
+# ./src/volatility_regimes.py
 
 import pandas as pd
 import numpy as np

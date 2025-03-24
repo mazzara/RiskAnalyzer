@@ -1,4 +1,4 @@
-# ./OilAnalyzer/label_candlesitcks.py
+# ./src/label_candlesitcks.py
 
 
 def classify_candle(open_price, high_price, low_price, close_price):

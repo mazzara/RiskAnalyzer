@@ -1,4 +1,4 @@
-# ./OilAnalyzer/monte_carlo_simulation_v2.py
+# ./src/monte_carlo_simulation_v2.py
 
 import numpy as np
 import pandas as pd
@@ -71,6 +71,9 @@ def monte_carlo_simulation_v2(start_price, regimes_df, garch_results, hmm_model,
             # Price evolution
             current_price *= np.exp(random_return)
             price_paths[t, sim] = current_price
+    print(f"Function monte_carlo_simulation_v2 executed {n_simulations} simulations price paths with {n_steps} steps each.")
+    print(f"Start Price: {start_price}")
+    print(f"Simulated Price Paths: {price_paths.shape}")
 
     return price_paths
 
@@ -101,8 +104,8 @@ def calculate_var_cvar(price_paths, confidence_level=0.95):
     var = np.percentile(returns, (1 - confidence_level) * 100)
     cvar = returns[returns <= var].mean()
 
-    print(f"[Risk] VaR ({confidence_level * 100:.0f}%): {var * 100:.2f}%")
-    print(f"[Risk] CVaR ({confidence_level * 100:.0f}%): {cvar * 100:.2f}%")
+    print(f"[Risk: function monte_carlo_simulation_v2] VaR ({confidence_level * 100:.0f}%): {var * 100:.2f}%")
+    print(f"[Risk: function monte_carlo_simulation_V2] CVaR ({confidence_level * 100:.0f}%): {cvar * 100:.2f}%")
 
     return var, cvar
 

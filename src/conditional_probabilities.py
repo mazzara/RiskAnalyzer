@@ -1,4 +1,4 @@
-# ./OilAnalyzer/conditional_probabilities.py
+# ./src/conditional_probabilities.py
 
 import pandas as pd
 import numpy as np
@@ -188,5 +188,50 @@ def conditional_probabilities_pipeline(df, threshold=0.0, max_chain=5):
         'cond_probs': cond_probs,
         'tpm': tpm_df
     }
+
+
+def full_conditional_probabilities(df, state_column='state', max_chain=5):
+    """
+    Compute full conditional probabilities for all next states 
+    given N previous states (chain of length N).
+
+    Returns:
+        dict of: {chain_len: {prev_chain: {state: prob}}}
+    """
+    from collections import Counter
+
+    full_cond_probs = {}
+    states = df[state_column].values
+    length = len(states)
+
+    for chain_len in range(1, max_chain + 1):
+        next_state_counts = {}  # holds {prev_chain: {next_state: count}}
+        total_counts = {}
+
+        for i in range(chain_len, length - 1):
+            prev_chain = tuple(states[i - chain_len:i])
+            next_state = states[i]
+
+            # Initialize if new chain
+            if prev_chain not in next_state_counts:
+                next_state_counts[prev_chain] = Counter()
+
+            # Count transitions
+            next_state_counts[prev_chain][next_state] += 1
+
+            # Track total counts for this chain
+            total_counts[prev_chain] = total_counts.get(prev_chain, 0) + 1
+
+        # Convert counts to probabilities
+        chain_probs = {}
+        for prev_chain, state_counts in next_state_counts.items():
+            chain_probs[prev_chain] = {
+                state: count / total_counts[prev_chain]
+                for state, count in state_counts.items()
+            }
+
+        full_cond_probs[chain_len] = chain_probs
+
+    return full_cond_probs
 
 # end of conditional_probabilities.py

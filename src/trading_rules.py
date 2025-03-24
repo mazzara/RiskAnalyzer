@@ -1,4 +1,4 @@
-# ./OilAnalyzer/trading_rules.py
+# ./src/trading_rules.py
 
 def determine_regime_strategy(regime, garch_volatility, chain_probs, current_price):
     """

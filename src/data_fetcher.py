@@ -1,4 +1,4 @@
-# ./OilAnalyzer/data_fetcher.py 
+# ./src/data_fetcher.py 
 
 import pandas as pd
 import yfinance as yf
@@ -46,6 +46,105 @@ def validate_date_range(interval, start_date, end_date):
     return start_date, end_date
 
 
+def normalize_columns(data, symbol):
+    """
+    Renames columns with symbol-specific suffixes to generic OHLCV columns.
+
+    E.g., from 'close_ng=f' to 'close'.
+    """
+    symbol_prefix = symbol.lower()
+
+    rename_map = {
+        f'open_{symbol_prefix}': 'open',
+        f'high_{symbol_prefix}': 'high',
+        f'low_{symbol_prefix}': 'low',
+        f'close_{symbol_prefix}': 'close',
+        f'adj_close_{symbol_prefix}': 'adj_close',
+        f'volume_{symbol_prefix}': 'volume'
+    }
+
+    # Perform rename
+    data.rename(columns=rename_map, inplace=True)
+
+    # Optional sanity check
+    required_cols = ['open', 'high', 'low', 'close', 'adj_close', 'volume']
+    missing = [col for col in required_cols if col not in data.columns]
+    if missing:
+        raise ValueError(f"[Error] Missing expected columns after renaming: {missing}")
+
+    return data
+
+
+
+# def get_market_data(symbol, start_date, end_date, interval='1d', auto_adjust=False):
+#     """
+#     Fetch and return cleaned market data for a symbol.
+#     """
+#
+#     # Validate dates for intraday intervals
+#     start_date, end_date = validate_date_range(interval, start_date, end_date)
+#
+#     try:
+#         print(f"[Info] Fetching {interval} data for {symbol} from {start_date} to {end_date}")
+#         
+#         # Fetch data from Yahoo Finance
+#         data = yf.download(
+#             symbol,
+#             start=start_date,
+#             end=end_date,
+#             interval=interval,
+#             session=session,
+#             progress=False,
+#             auto_adjust=auto_adjust
+#         )
+#         
+#     except Exception as e:
+#         print(f"[Error] Fetching data for {symbol}: {e}")
+#         return pd.DataFrame()
+#
+#     if data.empty:
+#         print(f"[Warning] No data retrieved for {symbol}. Check symbol and date range.")
+#         return pd.DataFrame()
+#
+#     # Reset index to turn datetime index into a column
+#     data.reset_index(inplace=True)
+#
+#     # Normalize time column to 'date'
+#     time_col = None
+#     for candidate in ['Date', 'Datetime']:
+#         if candidate in data.columns:
+#             time_col = candidate
+#             break
+#
+#     if time_col is None:
+#         print(f"[Warning] No Date/Datetime column found. Using index as 'date'.")
+#         data['date'] = data.index
+#     else:
+#         data.rename(columns={time_col: 'date'}, inplace=True)
+#
+#     # Ensure 'date' is in datetime format
+#     data['date'] = pd.to_datetime(data['date'])
+#
+#     # Clean column names
+#     data.columns = [col.lower().replace(' ', '_') for col in data.columns]
+#
+#     # Call normalization function here
+#     data = normalize_columns(data, symbol)
+#
+#     # Dataset Metadata
+#     print(f"\n[Info] Dataset Metadata:")
+#     print(f"- Timeframe: {interval}")
+#     print(f"- Date Range: {start_date} to {end_date}")
+#     print(f"- Rows: {len(data)}")
+#     print(f"- Columns ({len(data.columns)}): {list(data.columns)}")
+#
+#     return data
+#
+#
+
+
+
+
 def get_market_data(symbol, start_date, end_date, interval='1d', auto_adjust=False):
     """
     Fetch historical market data for a specified symbol from Yahoo Finance.
@@ -88,8 +187,7 @@ def get_market_data(symbol, start_date, end_date, interval='1d', auto_adjust=Fal
     # Reset index to turn datetime index into a column
     data.reset_index(inplace=True)
 
-    # Rename time column consistently to 'date'
-    # yfinance uses 'Date' or 'Datetime' depending on interval
+    # Normalize column to 'date'
     time_col = None
     for candidate in ['Date', 'Datetime']:
         if candidate in data.columns:
@@ -111,6 +209,8 @@ def get_market_data(symbol, start_date, end_date, interval='1d', auto_adjust=Fal
 
     # Ensure all column names are lowercase and spaces replaced
     data.columns = [col.lower().replace(' ', '_') for col in data.columns]
+
+    data = normalize_columns(data, symbol)
 
     # Display first few rows for verification
     print(f"[Info] Data fetched successfully for {symbol}:\n", data.head())

@@ -1,4 +1,4 @@
-# ./OilAnalyzer/descriptive_analysis.py
+# ./src/descriptive_analysis.py
 
 import pandas as pd
 import numpy as np

@@ -1,4 +1,4 @@
-# ./OilAnalysis/cli.py
+# ./src/cli.py
 import pandas as pd
 from datetime import datetime
 
@@ -55,7 +55,7 @@ def prompt_user_inputs():
     Prompts user for symbol, timeframe, and end date. Calculates start date automatically.
     Returns a configuration dictionary for the analysis run.
     """
-    print("\n=== Oil Analyzer CLI ===")
+    print("\n=== Risk Analyzer CLI ===")
     
     # Prompt symbol
     display_symbol_options()

@@ -1,4 +1,4 @@
-# ./OilAnalyzer/distribution_analysis.py
+# ./src/distribution_analysis.py
 
 import pandas as pd
 import numpy as np
