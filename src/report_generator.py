@@ -340,7 +340,7 @@ def generate_report(
 
     # === HEADER ===
     report_lines.append("=" * 50)
-    report_lines.append(f"{'OIL ANALYZER FINAL REPORT':^50}")
+    report_lines.append(f"{'RISK ANALYZER FINAL REPORT':^50}")
     report_lines.append("=" * 50)
     report_lines.append(f"Symbol        : {symbol}")
     report_lines.append(f"Timeframe     : {timeframe}")

@@ -22,7 +22,9 @@ AVAILABLE_SYMBOLS = {
     'SI=F': 'Silver Futures',
     'ZC=F': 'Corn Futures',
     'ZS=F': 'Soybean Futures',
-    'ZW=F': 'Wheat Futures'
+    'ZW=F': 'Wheat Futures',
+    'LE=F': 'Live Cattle Futures',
+    'BTC-USD': 'Bitcoin/USD',
 }
 
 def display_symbol_options():
