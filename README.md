@@ -96,8 +96,8 @@ run the main.py file
 === Risk Analyzer CLI ===
 
 Enter symbol to analyze [default CL=F]: 
-Enter timeframe (1d / 1h / 1m / etc): 
-Enter end date (YYYY-MM-DD):
+Enter timeframe (1d / 1h / 1m / etc) [default 1d]: 
+Enter end date (YYYY-MM-DD) [default today]: 
 ```
 
 ### 4. Review the Report
