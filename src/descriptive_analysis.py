@@ -67,7 +67,7 @@ def plot_distribution(df, column):
     plt.tight_layout()
     plt.show()
 
-def descriptive_statistics_pipeline(df, columns_to_analyze):
+def descriptive_statistics_pipeline(df, columns_to_analyze, show_plots=True):
     """
     Run descriptive analysis pipeline on a list of columns
     """
@@ -78,7 +78,8 @@ def descriptive_statistics_pipeline(df, columns_to_analyze):
         print(f"\n--- Analyzing column: {column} ---")
         summary_stats = compute_central_tendency_dispersion(df, column)
         normality_tests = perform_normality_tests(df, column)
-        plot_distribution(df, column)
+        if show_plots:
+            plot_distribution(df, column)
 
         results[column] = {
             'summary': summary_stats,

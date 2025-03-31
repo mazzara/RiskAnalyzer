@@ -375,7 +375,6 @@ def generate_report(
     # )
 
     # === FULL CONDITIONAL PROBABILITIES ===
-    report_lines.append("\n>>> Probabilities for Next State (Chain Lookup)")
 
     # You pass the current dataset and your full_cond_probs dictionary here!
     full_lookup_result = full_conditional_probability_lookup_full(data, full_cond_probs)
@@ -403,7 +402,18 @@ def generate_report(
 
     # Conditional chains
     chains = conditional_probs.get('cond_probs', {}).get(5, {})
-    for chain, prob in chains.items():
+    chain_items = list(chains.items())
+    n = 3
+    report_lines.append(f"\n>>> Top/Tail {n} Conditional Chains (Chain Length: 5)")
+    for chain, prob in chain_items[:n]:
+        chain_str = " > ".join(chain)
+        report_lines.append(f"{chain_str} => Continuation: {prob*100:.2f}%")
+
+    # ... elipsis 
+    if len(chains) > n:
+        report_lines.append("...")
+
+    for chain, prob in chain_items[-n:]:
         chain_str = " > ".join(chain)
         report_lines.append(f"{chain_str} => Continuation: {prob*100:.2f}%")
 

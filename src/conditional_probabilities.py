@@ -107,9 +107,11 @@ def conditional_probabilities(df, state_column='state', max_chain=5):
         }
 
         cond_probs[chain_len] = probabilities
-        print(f"\n[Conditional Probabilities] Chain length: {chain_len}")
-        for chain, prob in probabilities.items():
-            print(f"Prev {chain} => Continuation Probability: {prob:.2f}")
+
+        # Print conditional probabilities -- mostly for debugging
+        # print(f"\n[Conditional Probabilities] Chain length: {chain_len}")
+        # for chain, prob in probabilities.items():
+        #     print(f"Prev {chain} => Continuation Probability: {prob:.2f}")
 
     return cond_probs
 
@@ -161,7 +163,7 @@ def plot_tpm_heatmap(tpm_df):
 # -------------------------------
 # 6. PIPELINE FUNCTION
 # -------------------------------
-def conditional_probabilities_pipeline(df, threshold=0.0, max_chain=5):
+def conditional_probabilities_pipeline(df, threshold=0.0, max_chain=5, show_plots=True):
     """
     Full pipeline: classify states, runs test, conditional probabilities, Markov TPM
     """
@@ -180,7 +182,8 @@ def conditional_probabilities_pipeline(df, threshold=0.0, max_chain=5):
     tpm_df = markov_chain_tpm(df)
 
     # Step 5: Visualize TPM
-    plot_tpm_heatmap(tpm_df)
+    if show_plots:
+        plot_tpm_heatmap(tpm_df)
 
     print("\n[Info] Conditional Probability Analysis Completed.")
     return {

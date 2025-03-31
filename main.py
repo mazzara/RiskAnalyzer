@@ -11,15 +11,33 @@ from src.volatility_regimes import hmm_volatility_pipeline
 from src.monte_carlo import monte_carlo_simulation, plot_simulations, calculate_var_cvar
 from src.monte_carlo_v2 import monte_carlo_simulation_v2, plot_simulations, calculate_var_cvar
 from src.trading_rules import determine_regime_strategy, determine_trade_signal
-from src.label_candlesticks import classify_candle
+from src.label_candlesticks import classify_candle, simple_candle_state
 from src.report_generator import generate_report, full_conditional_probability_lookup_full, full_conditional_probability_lookup_full_verbose
+import argparse
+import json 
+
+with open("config/config.json") as f:
+    settings = json.load(f)
+
+threshold = settings["conditional_probability_state_threshold"]
+debug_mode = settings.get("debug_mode", False)
+n_steps = settings["monte_carlo"]["n_steps"]
+
+
+# CLI argument parser
+parser = argparse.ArgumentParser(description="Run RiskAnalyzer with optional debug mode.")
+parser.add_argument('--debug', action='store_true', help='Run in step-by-step debug mode')
+args = parser.parse_args()
+
+debug_mode = args.debug
+
+
+def pause_step(step_name):
+    if debug_mode:
+        input(f"\n[Paused] Step: {step_name} complete. Press Enter to continue...")
 
 
 if __name__ == '__main__':
-    # symbol = 'CL=F'
-    # start = '2025-02-01'
-    # end = '2025-03-21'
-    # interval = '30m'
 
     # CLI interaction
     config = prompt_user_inputs()
@@ -40,24 +58,14 @@ if __name__ == '__main__':
     if raw_data.empty:
         print("[Error] No data fetched. Exiting.")
         exit()
+    pause_step("Data Fetching")
 
-    print(raw_data.head(), "\n", raw_data.tail())
-
-    # Step 2: Rename columns
-    # raw_data.rename(columns={
-    #     'open_cl=f': 'open',
-    #     'high_cl=f': 'high',
-    #     'low_cl=f': 'low',
-    #     'close_cl=f': 'close',
-    #     'adj_close_cl=f': 'adj_close',
-    #     'volume_cl=f': 'volume'
-    # }, inplace=True)
-
-    # ==== Step 3: Run statistical analysis
+    # ==== Step 2: Run statistical analysis
     raw_data = run_statistical_analysis(raw_data)
     raw_data.to_csv('data_raw.csv', index=False)
+    pause_step("Statistical Analysis - Raw Data (Pre-Filtering)")
 
-    # Step 3.1: Filter outliers using combined method (Z-score + Quantile)
+    # Step 2.1: Filter outliers using combined method (Z-score + Quantile)
     data_filtered = adaptive_outlier_filter(
         raw_data,
         column='daily_return_%',
@@ -71,26 +79,35 @@ if __name__ == '__main__':
 
     data = data_filtered.copy()
 
+    pause_step("Statistical Analysis & Outlier Filtering")
+
+    # ==== Step 3: Descriptive stats & distribution analysis
+    columns_to_analyze = ['daily_return_%', 'daily_range_%', 'tr', 'atr_14']
+
+    # Capture Returns stats
+    # Function returns a dictionary to be used in the report
+    desc_stats = descriptive_statistics_pipeline(data, columns_to_analyze, show_plots=False)
+    dist_results = distribution_analysis_pipeline(data, column='daily_return_%', thresholds=[1,2,3], show_plots=False)
+    pause_step("Distribution Analysis")
+
     # ==== Step 4: Label Candlesticks
     data['candlestick'] = data.apply(
         lambda row: classify_candle(row['open'], row['high'], row['low'], row['close']),
         axis=1
     )
+    data['candle_state'] = data.apply(simple_candle_state, axis=1)
+    pause_step("Candlestick Labeling")
 
-    # ==== Step 5: Descriptive stats & distribution analysis
-    columns_to_analyze = ['daily_return_%', 'daily_range_%', 'tr', 'atr_14']
-
-    # Capture Returns
-    desc_stats = descriptive_statistics_pipeline(data, columns_to_analyze)
-    dist_results = distribution_analysis_pipeline(data, column='daily_return_%', thresholds=[1,2,3])
-
-    # ==== Step 6: Conditional Probabilities & Continuation Patterns
-    cond_probs_results = conditional_probabilities_pipeline(data, threshold=0.0, max_chain=5)
+    # ==== Step 5: Conditional Probabilities & Continuation Patterns
+    cond_probs_results = conditional_probabilities_pipeline(data, threshold=0.05, max_chain=5, show_plots=False)
+    pause_step("Conditional Probabilities & Continuation Patterns")
 
     # NEW: Full Conditional Probabilities for All States
-    full_cond_probs = full_conditional_probabilities(data, max_chain=5)
-    print(full_cond_probs.keys())
-    print("[Debug] Example for chain length 5:", full_cond_probs.get(5, {}))
+    full_cond_probs = full_conditional_probabilities(data, state_column='candle_state', max_chain=5)
+
+    # Debugging: Print example for chain length 5
+    # print(full_cond_probs.keys())
+    # print("[Debug] Example for chain length 5:", full_cond_probs.get(5, {}))
 
     # After conditional_probs_results is generated...
     print("\n[Verbose] Conditional Probability Chain Analysis...")
@@ -106,6 +123,7 @@ if __name__ == '__main__':
 
     # Display results
     print(f"\n[Verbose] Continuation Probability for Chain '{' > '.join(current_chain)}':")
+
     if probability is not None:
         print(f"- Continuation Probability (stay {current_chain[-1]}): {probability * 100:.2f}%")
     else:
@@ -119,16 +137,20 @@ if __name__ == '__main__':
     else:
         print("- No next state probabilities available for this chain.")
 
-    # ==== Step 7: Volatility Analysis
+    pause_step("Full Conditional Probabilities")
+
+    # ==== Step 6: Volatility Analysis
     garch_results = fit_garch(data, return_column='daily_return_%')
-    plot_volatility(data, garch_results)
+    # plot_volatility(data, garch_results)
     forecast_df = forecast_volatility(garch_results, steps=5)
     print(forecast_df)
+    pause_step("Volatility Analysis")
 
-    # ==== Step 8: Run HMM regime detection
-    hmm_model, data_with_regimes = hmm_volatility_pipeline(data, return_column='daily_return_%', n_states=2)
+    # ==== Step 7: Run HMM regime detection
+    hmm_model, data_with_regimes = hmm_volatility_pipeline(data, return_column='daily_return_%', n_states=2, show_plots=False)
+    pause_step("HMM Regime Detection")
 
-    # ==== Step 9: Monte Carlo Simultion - v1.0 (Simple)
+    # ==== Step 8: Monte Carlo Simultion - v1.0 (Simple)
     # Get current price
     current_price = data['close'].iloc[-1]
     # Simple mu/sigma estimates from historical data
@@ -146,12 +168,12 @@ if __name__ == '__main__':
             n_steps=n_steps,
             n_simulations=n_simulations)
     # Plot simulated price paths
-    plot_simulations(simulated_price_paths)
+    # plot_simulations(simulated_price_paths)
     # Calculate VaR and CVaR
     var_v1, cvar_v1 = calculate_var_cvar(simulated_price_paths, confidence_level=0.95)
 
 
-    # ==== Step 10: Monte carlo v2.0 (Regime + Volatility Aware)
+    # ==== Step 9: Monte carlo v2.0 (Regime + Volatility Aware)
     current_price = data['close'].iloc[-1]
     print(f"Current Price: {current_price}")
 
@@ -168,13 +190,15 @@ if __name__ == '__main__':
     )
 
     # Plot simulations
-    plot_simulations(simulated_price_paths)
+    # plot_simulations(simulated_price_paths)
 
     # Risk metrics
     var_v2, cvar_v2 = calculate_var_cvar(simulated_price_paths, confidence_level=0.95)
 
+    pause_step("Monte Carlo Simulations")
 
-    # ==== Step 11: Actionable Trading Insights
+
+    # ==== Step 10: Actionable Trading Insights
     current_regime = data_with_regimes['hmm_state'].iloc[-1]
     next_vol_forecast = forecast_volatility(garch_results, steps=1).iloc[0]['forecast_volatility']
     continuation_prob = 0.65  # Example from Markov or Chains
@@ -200,8 +224,10 @@ if __name__ == '__main__':
         print(f"{k}: {v}")
 
     # Show and/or save
-    print(data.head(20))
+    print(data.tail(20))
     data.to_csv('data_with_stats.csv', index=False)
+
+    pause_step("Trading Insights")
 
     # Final step === Generate Report ===
     generate_report(
@@ -223,6 +249,9 @@ if __name__ == '__main__':
         },
         trade_signal=trade_signal
     )
+
+    # Print tail of data
+    print(data.tail())
 
     print("\n[Info] Analysis Complete.\n")
 

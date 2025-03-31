@@ -1,0 +1,31 @@
+{
+  "use_cli": true, 
+  "default_symbol": "CL=F",
+  "default_timeframe": "1d",
+  "return_column": "daily_return_%",
+  "debug_mode": true,
+  "data_source": "yfinance",
+
+  "outlier_filtering": {
+  "method": "combined",
+  "z_thresh": 3.0,
+  "lower_quantile": 0.01,
+  "upper_quantile": 0.99
+	}
+
+  "conditional_probability_state_threshold": 0.0,
+  "max_chain_length": 5,
+  "state_column": "state",
+
+  "hmm_n_states": 2,
+  "var_cvar_confidance_level": 0.95,
+  "show_plots": false,
+
+  "monte_carlo": {
+  "n_steps": 10,
+  "n_simulations": 500
+	},
+
+  "risk_per_trade": 0.01,
+  "account_size": 50000
+}

@@ -75,76 +75,6 @@ def normalize_columns(data, symbol):
     return data
 
 
-
-# def get_market_data(symbol, start_date, end_date, interval='1d', auto_adjust=False):
-#     """
-#     Fetch and return cleaned market data for a symbol.
-#     """
-#
-#     # Validate dates for intraday intervals
-#     start_date, end_date = validate_date_range(interval, start_date, end_date)
-#
-#     try:
-#         print(f"[Info] Fetching {interval} data for {symbol} from {start_date} to {end_date}")
-#         
-#         # Fetch data from Yahoo Finance
-#         data = yf.download(
-#             symbol,
-#             start=start_date,
-#             end=end_date,
-#             interval=interval,
-#             session=session,
-#             progress=False,
-#             auto_adjust=auto_adjust
-#         )
-#         
-#     except Exception as e:
-#         print(f"[Error] Fetching data for {symbol}: {e}")
-#         return pd.DataFrame()
-#
-#     if data.empty:
-#         print(f"[Warning] No data retrieved for {symbol}. Check symbol and date range.")
-#         return pd.DataFrame()
-#
-#     # Reset index to turn datetime index into a column
-#     data.reset_index(inplace=True)
-#
-#     # Normalize time column to 'date'
-#     time_col = None
-#     for candidate in ['Date', 'Datetime']:
-#         if candidate in data.columns:
-#             time_col = candidate
-#             break
-#
-#     if time_col is None:
-#         print(f"[Warning] No Date/Datetime column found. Using index as 'date'.")
-#         data['date'] = data.index
-#     else:
-#         data.rename(columns={time_col: 'date'}, inplace=True)
-#
-#     # Ensure 'date' is in datetime format
-#     data['date'] = pd.to_datetime(data['date'])
-#
-#     # Clean column names
-#     data.columns = [col.lower().replace(' ', '_') for col in data.columns]
-#
-#     # Call normalization function here
-#     data = normalize_columns(data, symbol)
-#
-#     # Dataset Metadata
-#     print(f"\n[Info] Dataset Metadata:")
-#     print(f"- Timeframe: {interval}")
-#     print(f"- Date Range: {start_date} to {end_date}")
-#     print(f"- Rows: {len(data)}")
-#     print(f"- Columns ({len(data.columns)}): {list(data.columns)}")
-#
-#     return data
-#
-#
-
-
-
-
 def get_market_data(symbol, start_date, end_date, interval='1d', auto_adjust=False):
     """
     Fetch historical market data for a specified symbol from Yahoo Finance.
@@ -213,7 +143,7 @@ def get_market_data(symbol, start_date, end_date, interval='1d', auto_adjust=Fal
     data = normalize_columns(data, symbol)
 
     # Display first few rows for verification
-    print(f"[Info] Data fetched successfully for {symbol}:\n", data.head())
+    print(f"[Info] Data fetched successfully for {symbol}:\n")
 
     # [Info]: Show dataset description
     print("\n[Info] Dataset Metadata:")
@@ -225,8 +155,8 @@ def get_market_data(symbol, start_date, end_date, interval='1d', auto_adjust=Fal
     print(f"- Last Date: {data['date'].iloc[-1] if not data.empty else 'N/A'}")
 
     # Preview first and last 3 rows (optional for deeper debugging)
-    print("\n[Preview] First 3 rows:\n", data.head(3))
-    print("\n[Preview] Last 3 rows:\n", data.tail(3))
+    print("\n[Preview] First 3 rows:\n", data.head())
+    print("\n[Preview] Last 3 rows:\n", data.tail())
 
     return data
 

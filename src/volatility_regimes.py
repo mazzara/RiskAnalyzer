@@ -94,7 +94,7 @@ def plot_state_probabilities(model, df, date_column='date'):
 # --------------------------------------------------------
 # 4. Pipeline Function
 # --------------------------------------------------------
-def hmm_volatility_pipeline(df, return_column='daily_return_%', n_states=2):
+def hmm_volatility_pipeline(df, return_column='daily_return_%', n_states=2, show_plots=True):
     """
     Full pipeline for fitting HMM, plotting regimes and probabilities.
     """
@@ -104,10 +104,12 @@ def hmm_volatility_pipeline(df, return_column='daily_return_%', n_states=2):
     model, df_with_states = fit_hmm(df, return_column=return_column, n_states=n_states)
 
     # Step 2: Plot states (scatter by regime)
-    plot_hmm_states(df_with_states, return_column=return_column)
+    if show_plots:
+        plot_hmm_states(df_with_states, return_column=return_column)
 
     # Step 3: Plot regime probabilities
-    plot_state_probabilities(model, df_with_states)
+    if show_plots:
+        plot_state_probabilities(model, df_with_states)
 
     print("\n[Info] HMM Regime Detection Completed.")
     return model, df_with_states

@@ -1,4 +1,37 @@
 # ./src/label_candlesitcks.py
+import pandas as pd
+
+
+def simple_candle_state(row, atr_column='atr_14', threshold_ratio=0.3):
+    """
+    Classify simplified candle state as BULL, BEAR, or DOJI
+    based on the body size relative to ATR.
+
+    Parameters:
+        row (pd.Series): A row of the DataFrame with OHLC and ATR values.
+        atr_column (str): Name of the column with ATR value.
+        threshold_ratio (float): Minimum body/ATR ratio to consider as directional.
+
+    Returns:
+        str: 'BULL', 'BEAR', or 'DOJI'
+    """
+    open_price = row['open']
+    close_price = row['close']
+    atr = row.get(atr_column, 0)
+
+    # Sanity checks
+    if atr == 0 or pd.isna(atr):
+        return "DOJI"
+
+    body_size = abs(close_price - open_price)
+    body_ratio = body_size / atr
+
+    if body_ratio < threshold_ratio:
+        return "DOJI"
+    elif close_price > open_price:
+        return "BULL"
+    else:
+        return "BEAR"
 
 
 def classify_candle(open_price, high_price, low_price, close_price):

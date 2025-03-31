@@ -8,6 +8,7 @@ def compute_daily_return(df):
     Compute Daily Return (%)
     """
     df['daily_return_%'] = df['close'].pct_change() * 100
+    df['daily_return_decimal'] = df['close'].pct_change()
     return df
 
 def compute_daily_range(df):
@@ -15,6 +16,7 @@ def compute_daily_range(df):
     Compute Daily Range (%) = (High - Low) / Low * 100
     """
     df['daily_range_%'] = (df['high'] - df['low']) / df['low'] * 100
+    df['daily_range_decimal'] = (df['high'] - df['low']) / df['low']
     return df
 
 def compute_true_range(df):

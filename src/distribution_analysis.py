@@ -89,7 +89,7 @@ def probability_of_move(dist, params, threshold, tail='both'):
     return prob
 
 # default test thresholds = 2  or 2% move
-def distribution_analysis_pipeline(df, column, thresholds=[2.00]):
+def distribution_analysis_pipeline(df, column, thresholds=[2.00], show_plots=True):
     """
     Run distribution fitting, GoF tests, and probability estimation on a given column.
     """
@@ -106,7 +106,8 @@ def distribution_analysis_pipeline(df, column, thresholds=[2.00]):
         dist, params = fit_distribution(data, dist_name)
 
         # Plot PDF and CDF
-        plot_distribution_fit(data, dist, params, dist_name, column)
+        if show_plots:
+            plot_distribution_fit(data, dist, params, dist_name, column)
 
         # GoF Tests
         gof_results = goodness_of_fit(data, dist, params)
