@@ -8,7 +8,7 @@ REPORTS_FOLDER = 'reports'
 os.makedirs(REPORTS_FOLDER, exist_ok=True)
 
 
-def continuation_probability_lookup(data, conditional_probs):
+def continuation_probability_lookup(data, conditional_probs, column_state='state'):
     """
     Looks up the continuation probability for the latest chain of states in the dataset.
     
@@ -44,7 +44,7 @@ def continuation_probability_lookup(data, conditional_probs):
         }
 
     # Extract the latest chain from the data (up to the max_chain_len)
-    state_chain = tuple(data['state'].iloc[-max_chain_len:])
+    state_chain = tuple(data[column_state].iloc[-max_chain_len:])
 
     probability = None
     matched_chain_str = None
@@ -74,7 +74,7 @@ def continuation_probability_lookup(data, conditional_probs):
     }
 
 
-def conditional_probability_lookup_full(conditional_probs, data, report_lines=None):
+def conditional_probability_lookup_full(conditional_probs, data, report_lines=None, column_state='state'):
     """
     Enhanced lookup that reports continuation probability and full next state probabilities.
     
@@ -95,7 +95,7 @@ def conditional_probability_lookup_full(conditional_probs, data, report_lines=No
     max_chain_len = max(chain_probs.keys(), default=0)
 
     # Get the last N states from the data (up to max_chain_len)
-    state_chain = tuple(data['state'].iloc[-max_chain_len:])
+    state_chain = tuple(data[column_state].iloc[-max_chain_len:])
 
     continuation_prob = None  # Return value
     found = False  # Control flag for loop
@@ -136,58 +136,7 @@ def conditional_probability_lookup_full(conditional_probs, data, report_lines=No
     return continuation_prob
 
 
-# def full_conditional_probability_lookup_full(data, full_cond_probs):
-#     """
-#     Look up the full probability distribution for the current state chain.
-#     
-#     Args:
-#         data (DataFrame): must have 'state' column with classified states.
-#         full_cond_probs (dict): output from full_conditional_probabilities()
-#
-#     Returns:
-#         tuple(chain_str, probabilities_dict)
-#     """
-#     report_lines = []
-#
-#     # Get the maximum chain length we calculated
-#     max_chain_len = max(full_cond_probs.keys(), default=0)
-#
-#     # Get the latest chain from data
-#     state_chain = tuple(data['state'].iloc[-max_chain_len:])
-#
-#     # Placeholder for probabilities
-#     continuation_prob = None
-#     next_state_probs = None
-#     probability_distribution = None
-#
-#     # Start from longest chain length and go backward
-#     for chain_len in range(max_chain_len, 0, -1):
-#         lookup_chain = state_chain[-chain_len:]
-#         chain_probs = full_cond_probs.get(chain_len, {})
-#
-#         if lookup_chain in chain_probs:
-#             probability_distribution = chain_probs[lookup_chain]
-#             chain_str = " > ".join(lookup_chain)
-#             report_lines.append(f"Pattern: {chain_str}")
-#             report_lines.append(f"Next State Probabilities:")
-#
-#             # Sort by highest probability first
-#             for state, prob in sorted(probability_distribution.items(), key=lambda x: x[1], reverse=True):
-#                 if state == lookup_chain[-1]:
-#                     label = f"{state} (continuation)"
-#                 else:
-#                     label = f"{state} (reversal)"
-#
-#                 report_lines.append(f"- {label}: {prob * 100:.2f}%")
-#             break
-#
-#     if probability_distribution is None:
-#         report_lines.append("No continuation probabilities found for current pattern.")
-#
-#     return report_lines, probability_distribution
-
-
-def full_conditional_probability_lookup_full(data, full_cond_probs):
+def full_conditional_probability_lookup_full(data, full_cond_probs, state_column='state'):
     """
     Look up continuation probability + full next state probabilities for the current state chain.
     
@@ -204,7 +153,7 @@ def full_conditional_probability_lookup_full(data, full_cond_probs):
     max_chain_len = max(full_cond_probs.keys(), default=0)
 
     # Get the latest chain from data
-    state_chain = tuple(data['state'].iloc[-max_chain_len:])
+    state_chain = tuple(data[state_column].iloc[-max_chain_len:])
 
     continuation_prob = None
     next_state_probs = None
@@ -218,7 +167,9 @@ def full_conditional_probability_lookup_full(data, full_cond_probs):
             next_state_probs = chain_probs[lookup_chain]
             continuation_prob = next_state_probs.get(lookup_chain[-1], None)
 
-            chain_str = " > ".join(lookup_chain)
+            # chain_str = " > ".join(lookup_chain)
+            chain_str = " > ".join(map(str, lookup_chain))
+
             report_lines.append(f"Pattern: {chain_str}")
 
             report_lines.append("Next State Probabilities:")
@@ -234,7 +185,11 @@ def full_conditional_probability_lookup_full(data, full_cond_probs):
     return report_lines
 
 
-def full_conditional_probability_lookup_full_verbose(data, full_cond_probs):
+def format_chain(chain):
+    return " > ".join(map(str, chain))
+
+
+def full_conditional_probability_lookup_full_verbose(data, full_cond_probs, state_column='state'):
     """
     Look up continuation probability + full next state probabilities for the current state chain.
     
@@ -249,7 +204,7 @@ def full_conditional_probability_lookup_full_verbose(data, full_cond_probs):
     max_chain_len = max(full_cond_probs.keys(), default=0)
 
     # Get the latest chain from data
-    state_chain = tuple(data['state'].iloc[-max_chain_len:])
+    state_chain = tuple(data[state_column].iloc[-max_chain_len:])
 
     continuation_prob = None
     next_state_probs = None
@@ -266,7 +221,8 @@ def full_conditional_probability_lookup_full_verbose(data, full_cond_probs):
 
             # For verbose display (optional)
             print(f"\n[Verbose] Probabilities for Next State (Chain Lookup):")
-            chain_str = " > ".join(lookup_chain)
+            # chain_str = " > ".join(lookup_chain)
+            chain_str = " > ".join(map(str, lookup_chain))
             print(f"Pattern: {chain_str}")
 
             for state, prob in sorted(next_state_probs.items(), key=lambda x: x[1], reverse=True):
@@ -318,6 +274,57 @@ def format_trade_signal(trade_signal, symbol, timeframe):
     return report
 
 
+# def format_latest_candles(data, n=5, state_column='state'):
+#     rows = []
+#     rows.append("Latest Candles Overview")
+#     rows.append("─" * 55)
+#     rows.append("Date        |  O     H     L     C  |  State  |")
+#     rows.append("────────────┼───────────────────────┼─────────┤")
+#     
+#     for _, row in data.tail(n).iterrows():
+#         date = row['date'].strftime("%Y-%m-%d")
+#         o, h, l, c = [f"{row[col]:.2f}" for col in ['open', 'high', 'low', 'close']]
+#         # state = row.get('candle_state', 'N/A')
+#         state = row.get(state_column, 'N/A')
+#         rows.append(f"{date}  | {o} {h} {l} {c} | {state:<6} |")
+#
+#     rows.append("─" * 55)
+#     sma_fast = data['sma_fast'].iloc[-1]
+#     sma_slow = data['sma_slow'].iloc[-1]
+#     last_row = data.iloc[-1]
+#     rows.append(f"SMA Fast: {sma_fast:.2f}     SMA Slow: {sma_slow:.2f}")
+#     rows.append(f"Current State: {last_row.get('candle_state', 'N/A')}  | Candle Pattern: {last_row.get('candlestick', 'N/A')}")
+#     rows.append("─" * 55)
+#     
+#     return "\n".join(rows)
+
+
+def format_latest_candles(data, n=5, state_column='state'):
+    rows = []
+    rows.append(">>> Latest Candles Overview")
+    rows.append("─" * 70)
+    rows.append("Date        |   O     H     L     C   |   %   |  State  |")
+    rows.append("────────────┼─────────────────────────┼───────┼─────────┤")
+    
+    for _, row in data.tail(n).iterrows():
+        date = row['date'].strftime("%Y-%m-%d")
+        o, h, l, c = [f"{row[col]:.2f}" for col in ['open', 'high', 'low', 'close']]
+        pct = row.get('daily_return_%', 0.0)
+        pct_str = f"{pct:+.2f}%"
+        state = row.get(state_column, 'N/A')
+        rows.append(f"{date}  | {o} {h} {l} {c} | {pct_str:>6} | {state:<6} |")
+
+    rows.append("─" * 70)
+    sma_fast = data['sma_fast'].iloc[-1]
+    sma_slow = data['sma_slow'].iloc[-1]
+    last_row = data.iloc[-1]
+    rows.append(f"SMA Fast: {sma_fast:.2f}     SMA Slow: {sma_slow:.2f}")
+    rows.append(f"Current State: {last_row.get('candle_state', 'N/A')}  | Candle Pattern: {last_row.get('candlestick', 'N/A')}")
+    rows.append("─" * 70)
+
+    return "\n".join(rows)
+
+
 def generate_report(
     symbol,
     timeframe,
@@ -332,7 +339,8 @@ def generate_report(
     volatility_forecast,  # <-- here it is!
     hmm_results,
     monte_carlo,
-    trade_signal):
+    trade_signal,
+    state_column='state'):
     """
     Generates a comprehensive report and saves it to file.
     """
@@ -357,27 +365,23 @@ def generate_report(
     latest_close = data['close'].iloc[-1] if 'close' in data.columns else 'N/A'
 
     # Latest state (bullish, bearish, neutral) from conditional probabilities
-    latest_state = data['state'].iloc[-1] if 'state' in data.columns else 'N/A'
+    latest_state = data[state_column].iloc[-1] if 'state' in data.columns else 'N/A'
 
     report_lines.append(f"- Latest Price Close      : {latest_close:,.2f} USD")
     report_lines.append(f"- Latest Return State     : {latest_state}")
     report_lines.append("\n>>> Continuation Probability Lookup")
 
-    # continuation_result = continuation_probability_lookup(data, conditional_probs)
-    #
-    # report_lines.append(continuation_result['message'])
-
-    # === CONTINUATION LOOKUP (FULL) ===
-    # conditional_probability_lookup_full(
-    #     conditional_probs=conditional_probs,
-    #     data=data,
-    #     report_lines=report_lines
-    # )
-
     # === FULL CONDITIONAL PROBABILITIES ===
 
     # You pass the current dataset and your full_cond_probs dictionary here!
-    full_lookup_result = full_conditional_probability_lookup_full(data, full_cond_probs)
+    full_lookup_result = full_conditional_probability_lookup_full(
+        data,
+        full_cond_probs,
+        state_column=state_column)
+
+    print("[Debug] Available columns:", data.columns.tolist())
+    print("[Debug] Requested state column:", state_column)
+
     report_lines.extend(full_lookup_result)
 
     # === DESCRIPTIVE STATISTICS ===
@@ -398,7 +402,12 @@ def generate_report(
     report_lines.append("\n>>> Conditional Probabilities")
     runs = conditional_probs.get('runs_info', {})
     report_lines.append(f"Total Runs    : {runs.get('total_runs', 'N/A')}")
-    report_lines.append(f"Z-Score       : {runs.get('z_score', 'N/A'):.2f}")
+    # report_lines.append(f"Z-Score       : {runs.get('z_score', 'N/A'):.2f}")
+    z_score = runs.get("z_score", None)
+    if isinstance(z_score, (float, int)):
+        report_lines.append(f"Z-Score       : {z_score:.2f}")
+    else:
+        report_lines.append("Z-Score       : N/A")
 
     # Conditional chains
     chains = conditional_probs.get('cond_probs', {}).get(5, {})
@@ -406,7 +415,8 @@ def generate_report(
     n = 3
     report_lines.append(f"\n>>> Top/Tail {n} Conditional Chains (Chain Length: 5)")
     for chain, prob in chain_items[:n]:
-        chain_str = " > ".join(chain)
+        # chain_str = " > ".join(chain)
+        chain_str = " > ".join(map(str, chain))
         report_lines.append(f"{chain_str} => Continuation: {prob*100:.2f}%")
 
     # ... elipsis 
@@ -414,7 +424,8 @@ def generate_report(
         report_lines.append("...")
 
     for chain, prob in chain_items[-n:]:
-        chain_str = " > ".join(chain)
+        # chain_str = " > ".join(chain)
+        chain_str = " > ".join(map(str, chain))
         report_lines.append(f"{chain_str} => Continuation: {prob*100:.2f}%")
 
     # === VOLATILITY FORECAST ===
@@ -473,6 +484,9 @@ def generate_report(
     trade_signal_report = format_trade_signal(trade_signal, symbol, timeframe)
     report_lines.append("\n>>> Detailed Trade Signal")
     report_lines.append(trade_signal_report)
+
+    # === LATEST CANDLES ===
+    report_lines.append(format_latest_candles(data, n=5, state_column=state_column))
 
     # === FOOTER ===
     report_lines.append("-" * 50)

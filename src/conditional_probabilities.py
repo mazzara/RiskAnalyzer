@@ -30,6 +30,26 @@ def classify_state(row, threshold=0.0):
     else:
         return 'Neutral'
 
+
+def classify_state_dynamic(row, threshold):
+    if row['daily_return_%'] > threshold:
+        return 'Bullish'
+    elif row['daily_return_%'] < -threshold:
+        return 'Bearish'
+    else:
+        return 'Neutral'
+
+
+def get_dynamic_neutral_threshold(hmm_model):
+    """
+    Compute a dynamic threshold based on HMM state means.
+    Returns:
+        threshold: float (in decimal, e.g., 0.0042 for 0.42%)
+    """
+    hmm_means = hmm_model.means_.flatten()
+    return max(abs(hmm_means.min()), abs(hmm_means.max())) / 2
+
+
 # -------------------------------
 # 2. RUNS TEST
 # -------------------------------
@@ -127,7 +147,8 @@ def markov_chain_tpm(df, state_column='state'):
         tpm_df: DataFrame TPM
     """
     states = df[state_column].values
-    unique_states = ['Bullish', 'Bearish', 'Neutral']
+    # unique_states = ['Bullish', 'Bearish', 'Neutral']
+    unique_states = df[state_column].dropna().unique().tolist()
 
     transitions = {state: Counter() for state in unique_states}
 
@@ -162,30 +183,29 @@ def plot_tpm_heatmap(tpm_df):
 
 # -------------------------------
 # 6. PIPELINE FUNCTION
-# -------------------------------
-def conditional_probabilities_pipeline(df, threshold=0.0, max_chain=5, show_plots=True):
-    """
-    Full pipeline: classify states, runs test, conditional probabilities, Markov TPM
-    """
+# # -------------------------------
+
+def conditional_probabilities_pipeline(df, threshold=0.0, max_chain=5, show_plots=True, state_column='state'):
     print("\n[Info] Starting Conditional Probabilities & Continuation Patterns Analysis...")
 
-    # Step 1: Classify States
-    df['state'] = df.apply(lambda row: classify_state(row, threshold=threshold), axis=1)
-    
-    # Step 2: Runs Test
-    runs_info = runs_test(df)
+    if state_column == 'state':  # Only classify if using default column
+        df[state_column] = df.apply(lambda row: classify_state(row, threshold=threshold), axis=1)
 
-    # Step 3: Conditional Probabilities
-    cond_probs = conditional_probabilities(df, max_chain=max_chain)
+    # No filtering unless explicitly needed
+    # df = df[df[state_column] != "Neutral"].copy()
 
-    # Step 4: Markov Chain TPM
-    tpm_df = markov_chain_tpm(df)
+    runs_info = {}
+    if df[state_column].nunique() == 2:
+        runs_info = runs_test(df, state_column=state_column)
+    else:
+        print(f"[Warning] Runs test skipped: '{state_column}' has {df[state_column].nunique()} unique values (expected binary).")
 
-    # Step 5: Visualize TPM
+    cond_probs = conditional_probabilities(df, state_column=state_column, max_chain=max_chain)
+    tpm_df = markov_chain_tpm(df, state_column=state_column)
+
     if show_plots:
         plot_tpm_heatmap(tpm_df)
 
-    print("\n[Info] Conditional Probability Analysis Completed.")
     return {
         'runs_info': runs_info,
         'cond_probs': cond_probs,

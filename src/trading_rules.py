@@ -14,7 +14,7 @@ def determine_regime_strategy(regime, garch_volatility, chain_probs, current_pri
         strategy: dict with suggested action and risk parameters
     """
     strategy = {}
-    
+
     # Define basic strategies by regime
     if regime == 0:
         strategy['regime'] = "Low Volatility"
@@ -30,7 +30,7 @@ def determine_regime_strategy(regime, garch_volatility, chain_probs, current_pri
     risk_per_trade = 0.01  # 1% account risk
     volatility_factor = garch_volatility * current_price
     position_size = risk_per_trade / volatility_factor if volatility_factor != 0 else 0
-    
+
     strategy['position_size_factor'] = round(position_size, 4)
 
     # Conditional probabilities
@@ -49,7 +49,15 @@ def determine_regime_strategy(regime, garch_volatility, chain_probs, current_pri
     return strategy
 
 
-def determine_trade_signal(regime, current_price, mean_price, continuation_prob, reversal_prob, garch_vol, account_size=100000, risk_per_trade=0.01):
+def determine_trade_signal(regime,
+                           current_price,
+                           mean_price,
+                           contract_size,
+                           continuation_prob,
+                           reversal_prob,
+                           garch_vol,
+                           account_size=100000,
+                           risk_per_trade=0.01):
     """
     Generate trade suggestions based on regime, volatility, probabilities, and price levels.
 
@@ -119,6 +127,7 @@ def determine_trade_signal(regime, current_price, mean_price, continuation_prob,
 
     # --- Stop-Loss & Take-Profit Calculation ---
     stop_loss_distance = garch_vol * 2 * current_price
+    per_contract_risk = stop_loss_distance * contract_size
     take_profit_distance = garch_vol * 3 * current_price
 
     if trade_action == "BUY":
@@ -134,9 +143,14 @@ def determine_trade_signal(regime, current_price, mean_price, continuation_prob,
     # --- Position Sizing ---
     volatility_dollar_move = garch_vol * current_price
     if volatility_dollar_move != 0:
-        position_size_factor = risk_per_trade * account_size / (2 * volatility_dollar_move)
+        position_size_factor = risk_per_trade * account_size * contract_size / (2 * volatility_dollar_move)
     else:
         position_size_factor = 0
+
+    if per_contract_risk != 0:
+        position_size = (risk_per_trade * account_size) / per_contract_risk
+    else:
+        position_size = 0
 
     # --- Final Structured Signal ---
     trade_signal = {
@@ -150,7 +164,8 @@ def determine_trade_signal(regime, current_price, mean_price, continuation_prob,
         "take_profit_price": round(take_profit_price, 4) if take_profit_price else None,
         "stop_loss_distance": round(stop_loss_distance, 4),
         "take_profit_distance": round(take_profit_distance, 4),
-        "position_size": round(position_size_factor, 2),
+        # "position_size": round(position_size_factor, 2),
+        "position_size": round(position_size, 2),
         "confidence": confidence
     }
 

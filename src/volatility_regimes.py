@@ -48,6 +48,37 @@ def fit_hmm(df, return_column='daily_return_%', n_states=2):
     print(f"[Info] HMM means (per state): {model.means_.flatten()}")
     print(f"[Info] HMM covariances (per state): {model.covars_.flatten()}")
 
+    # --------------------------------------------------
+    # Classify regimes as Low, Moderate, High Volatility
+    # --------------------------------------------------
+    regime_states = range(model.n_components)
+
+    # Step 1: Get volatility distribution thresholds
+    vol_col = 'daily_range_%' if 'daily_range_%' in df.columns else return_column
+    low_vol = df[vol_col].quantile(0.33)
+    high_vol = df[vol_col].quantile(0.66)
+
+    # Step 2: Calculate volatility per HMM state
+    state_volatilities = {
+        state: df[df['hmm_state'] == state][vol_col].std()
+        for state in regime_states
+    }
+
+    # Step 3: Map volatility level to labels
+    state_labels = {}
+    for state, vol in state_volatilities.items():
+        if vol < low_vol:
+            label = "Low Volatility"
+        elif vol > high_vol:
+            label = "High Volatility"
+        else:
+            label = "Moderate Volatility"
+        state_labels[state] = label
+        print(f"[Regime {state}] volatility = {vol:.4f} → {label}")
+
+    # Step 4: Add labeled column to DataFrame
+    df['volatility_regime'] = df['hmm_state'].map(state_labels)
+
     return model, df
 
 # --------------------------------------------------------

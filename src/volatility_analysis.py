@@ -68,17 +68,17 @@ def plot_volatility(df, garch_results, return_column='daily_return_%'):
 # --------------------------------------------------------
 def forecast_volatility(garch_results, steps=5):
     forecasts = garch_results.forecast(horizon=steps)
-    
+
     vol_forecasts = forecasts.variance.values[-1, :]
-    
+
     # Convert variance to std dev and rescale from % to decimal
     forecast_vols = np.sqrt(vol_forecasts) #/ 100
-    
+
     df_forecast = pd.DataFrame({
         'forecast_mean': [0.0]*steps,
         'forecast_volatility': forecast_vols
     })
-    
+
     print("\n[Info] Volatility Forecast (Decimal % Move):\n", df_forecast.head())
     return df_forecast
 

@@ -32,10 +32,20 @@ def monte_carlo_simulation_v2(start_price, regimes_df, garch_results, hmm_model,
     regime_states = np.arange(hmm_model.n_components)  # <<< FIXED
     regime_mu_sigma = {}
 
+    # Fallback values from full dataset if any regime state is missing or invalid
+    emp_mu = regimes_df['daily_return_%'].mean() / 100
+    emp_sigma = regimes_df['daily_return_%'].std() / 100
+
     for state in regime_states:
         subset = regimes_df[regimes_df['hmm_state'] == state]
         mu = subset['daily_return_%'].mean() / 100  # to decimal
         sigma = subset['daily_return_%'].std() / 100
+
+        # Fallback to empirical values if missing
+        if np.isnan(mu) or np.isnan(sigma) or sigma == 0:
+            print(f"[Warning] Regime {state} has invalid mu/sigma. Using fallback (empirical) values.")
+            mu, sigma = emp_mu, emp_sigma
+
         regime_mu_sigma[state] = (mu, sigma)
         print(f"[Regime {state}] mu: {mu:.5f}, sigma: {sigma:.5f}")
 

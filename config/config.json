@@ -3,29 +3,60 @@
   "default_symbol": "CL=F",
   "default_timeframe": "1d",
   "return_column": "daily_return_%",
-  "debug_mode": true,
+  "debug_mode": false,
   "data_source": "yfinance",
+  "show_plots": false,
 
   "outlier_filtering": {
-  "method": "combined",
-  "z_thresh": 3.0,
-  "lower_quantile": 0.01,
-  "upper_quantile": 0.99
-	}
+      "method": "combined",
+      "z_thresh": 3.0,
+      "lower_quantile": 0.01,
+      "upper_quantile": 0.99,
+      "audit_filename": "data_excluded_outliers.csv"
+	    },
 
-  "conditional_probability_state_threshold": 0.0,
+  "state_classification": {
+    "std_cap_multiplier": 0.4,
+    "intraday_bias": {
+        "default": 1.0,
+        "intraday": 0.6
+    }
+  },
+
+  "conditional_probability_state_threshold": 0.1,
   "max_chain_length": 5,
+  "state_columns_annotated": ["state", "candle_state", "candlestick", "gain_loss"],
   "state_column": "state",
 
   "hmm_n_states": 2,
   "var_cvar_confidance_level": 0.95,
-  "show_plots": false,
 
   "monte_carlo": {
-  "n_steps": 10,
-  "n_simulations": 500
-	},
+      "n_steps": 10,
+      "n_simulations": 500
+	    },
 
   "risk_per_trade": 0.01,
-  "account_size": 50000
+  "account_size": 50000,
+
+  "symbol": {
+	      "CL=F": {
+	      "name":"Crude Oil Future",
+	      "contract_size": 100,
+	      "tick_size": 0.01,
+	      "multiplier": 1},
+
+	      "default": {
+		"name":"Unknown",
+		"contract_size": 1,
+		"tick_size": 0.01,
+		"multiplier": 1},
+
+	      "GC=F": {    
+		"name": "Gold Futures",
+		"contract_size": 100,
+		"tick_size": 0.1,
+		"multiplier": 10}
+	    }
+
 }
