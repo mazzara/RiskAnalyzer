@@ -13,6 +13,7 @@ from src.monte_carlo_v2 import monte_carlo_simulation_v2, plot_simulations, calc
 from src.trading_rules import determine_regime_strategy, determine_trade_signal
 from src.label_candlesticks import classify_candle, simple_candle_state
 from src.report_generator import generate_report, full_conditional_probability_lookup_full, full_conditional_probability_lookup_full_verbose
+# from src.analyze_positions import analyze_positions
 import argparse
 import json 
 import numpy as np
@@ -23,8 +24,10 @@ import numpy as np
 #
 
 # CLI argument parser
-parser = argparse.ArgumentParser(description="Run RiskAnalyzer with optional debug mode.")
+parser = argparse.ArgumentParser(description="Run RiskAnalyzer in normal or scanner mode.")
 parser.add_argument('--debug', action='store_true', help='Run in step-by-step debug mode')
+parser.add_argument('--scanner', action='store_true', help='Run scanner mode on predefined symbols')
+parser.add_argument('--positions', action='store_true', help='Analyze positions from config/positions.json')
 args = parser.parse_args()
 
 with open("config/config.json") as f:
@@ -55,14 +58,8 @@ def print_verbose(message, tag=None):
         print(f"{prefix} {message}")
 
 
-if __name__ == '__main__':
 
-    # CLI interaction
-    config = prompt_user_inputs()
-
-    if config is None:
-        exit()
-
+def run_analysis(config, position=None):
     symbol = config['symbol']
     start = config['start_date']
     end = config['end_date']
@@ -90,6 +87,8 @@ if __name__ == '__main__':
     state_config = settings.get("state_classification", {}).get("default", {})
     symbol_config = settings.get("state_classification", {}).get(symbol, {})
     time_config = symbol_config.get(interval, {})
+    risk_per_trade = settings.get("risk_per_trade", 0.01)
+    account_size = settings.get("account_size", 50000)
 
     std_cap_multiplier = time_config.get("std_cap_multiplier",
                          state_config.get("std_cap_multiplier", 0.4))
@@ -106,7 +105,7 @@ if __name__ == '__main__':
     raw_data = get_market_data(symbol, start, end, interval)
     if raw_data.empty:
         print("[Error] No data fetched. Exiting.")
-        exit()
+        raise ValueError(f"No data fetched for {symbol}")
     pause_step("Data Fetching")
 
     # ==== Step 2: Run statistical analysis
@@ -317,8 +316,8 @@ if __name__ == '__main__':
         continuation_prob=continuation_prob,
         reversal_prob=reversal_prob,
         garch_vol=next_vol_forecast,
-        account_size=50000,
-        risk_per_trade=0.01
+        account_size=account_size,
+        risk_per_trade=risk_per_trade
     )
 
     # Display output
@@ -366,6 +365,73 @@ if __name__ == '__main__':
     print_verbose(verbose)
 
     print("\n[Info] Analysis Complete.\n")
+
+    if position:
+        position_size = position.get("position_size", 1.0)
+        entry_price = position.get("entry_price")
+        side = position.get("side", "long").lower()
+        stop_loss = trade_signal.get("stop_loss")
+        take_profit = trade_signal.get("take_profit")
+        market_value = position_size * current_price
+        unrealized_pnl = (current_price - entry_price) * position_size if side == "long" else (entry_price - current_price) * position_size
+        pnl_percent = (unrealized_pnl / (entry_price * position_size)) * 100 if entry_price and position_size else 0
+
+        # Tactical Stop-based Risk
+        if stop_loss:
+            if side == "long":
+                stop_risk = max((entry_price - stop_loss) * position_size, 0)
+            else:
+                stop_risk = max((stop_loss - entry_price) * position_size, 0)
+        else:
+            stop_risk = None
+
+        evaluation = {
+            "symbol": symbol,
+            "side": side,
+            "position_size": position_size,
+            "entry_price": entry_price,
+            "entry_date": position.get("entry_date"),
+            "current_price": current_price,
+            "market_value": market_value,
+            "volatility_regime": trade_signal.get("regime"),
+            "strategy_bias": trade_signal.get("bias"),
+            "environment_action": trade_signal.get("trade_action"),
+            "confidence": trade_signal.get("confidence"),
+            "stop_loss": stop_loss,
+            "pnl": unrealized_pnl,
+            "pnl_percent": pnl_percent,
+            "take_profit": take_profit,
+            "stop_risk": stop_risk,
+            "var_95": var_v2 * market_value,
+            "cvar_95": cvar_v2 * market_value,
+            "recommended_exit": False  # Placeholder logic
+        } 
+        return evaluation
+
+    return trade_signal
+
+
+
+
+
+if __name__ == '__main__':
+    if args.scanner:
+        from src.scanner import scanner_mode
+        scanner_mode()
+        exit()
+    
+    if args.positions:
+        from src.analyze_positions import analyze_positions
+        analyze_positions()
+        exit()
+
+    # CLI interaction
+    config = prompt_user_inputs()
+
+    if config is None:
+        exit()
+    run_analysis(config)
+
 
 
 # end of main.py

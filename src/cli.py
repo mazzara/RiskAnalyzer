@@ -1,4 +1,5 @@
 # ./src/cli.py
+
 import pandas as pd
 from datetime import datetime
 
@@ -51,41 +52,49 @@ def calculate_start_date(end_date, timeframe):
     # Fallback
     return end_date - pd.DateOffset(years=5)
 
-
-def prompt_user_inputs():
+# New prompt_user_inputs parameter awerness: symbol, timeframe, end_date, confirm_required 
+def prompt_user_inputs(symbol=None, timeframe=None, end_date=None, confirm_required=True):
+# def prompt_user_inputs(confirm_required=True):
     """
+    Centralized user prompt for analysis configuration.
     Prompts user for symbol, timeframe, and end date. Calculates start date automatically.
     Returns a configuration dictionary for the analysis run.
     """
+    
+    # Underlying assumtions
+    valid_timeframes = ['1d', '1h', '1m', '5m', '15m', '30m']
+
     print("\n=== Risk Analyzer CLI ===")
     
     # Prompt symbol
-    display_symbol_options()
-    symbol = input("Enter symbol to analyze [default CL=F]: ").strip().upper() or 'CL=F'
+    if not symbol:
+        display_symbol_options()
+        symbol = input("Enter symbol to analyze [default CL=F]: ").strip().upper() or 'CL=F'
 
     # Prompt timeframe
-    valid_timeframes = ['1d', '1h', '1m', '5m', '15m', '30m']
-    timeframe_prompt = f"Enter timeframe ({' / '.join(valid_timeframes)}) [default 1d]: "
-    timeframe = input(timeframe_prompt).strip().lower() or '1d'
-    if timeframe in YFINANCE_INTRADAY_LIMITS:
-        max_days = YFINANCE_INTRADAY_LIMITS[timeframe]
-        print(f"\n[Note] Yahoo Finance limits {timeframe} data to the last {max_days} days.")
+    if not timeframe:
+        timeframe_prompt = f"Enter timeframe ({' / '.join(valid_timeframes)}) [default 1d]: "
+        timeframe = input(timeframe_prompt).strip().lower() or '1d'
+        if timeframe in YFINANCE_INTRADAY_LIMITS:
+            max_days = YFINANCE_INTRADAY_LIMITS[timeframe]
+            print(f"\n[Note] Yahoo Finance limits {timeframe} data to the last {max_days} days.")
 
-    while timeframe not in valid_timeframes:
-        print(f"Invalid timeframe! Choose from {valid_timeframes}")
-        timeframe = input("Enter timeframe (1d / 1h / 1m) [default 1d]: ").strip() or '1d'
+        while timeframe not in valid_timeframes:
+            print(f"Invalid timeframe! Choose from {valid_timeframes}")
+            timeframe = input("Enter timeframe (1d / 1h / 1m) [default 1d]: ").strip() or '1d'
 
     # Prompt end date
-    end_date_input = input("Enter end date (YYYY-MM-DD) [default today]: ").strip()
-    
-    if end_date_input == '':
-        end_date = pd.to_datetime('today').normalize()
-    else:
-        try:
-            end_date = pd.to_datetime(end_date_input)
-        except Exception as e:
-            print(f"Invalid date format: {e}")
-            return None
+    if not end_date:
+        end_date_input = input("Enter end date (YYYY-MM-DD) [default today]: ").strip()
+        
+        if end_date_input == '':
+            end_date = pd.to_datetime('today').normalize()
+        else:
+            try:
+                end_date = pd.to_datetime(end_date_input)
+            except Exception as e:
+                print(f"Invalid date format: {e}")
+                return None
 
     # Auto calculate start date
     start_date = calculate_start_date(end_date, timeframe)
@@ -97,10 +106,11 @@ def prompt_user_inputs():
     print(f"Date Range : {start_date.date()} to {end_date.date()}")
 
     # Confirm run
-    confirm = input("\nConfirm? (y/n): ").strip().lower()
-    if confirm != 'y':
-        print("Aborted by user.")
-        return None
+    if confirm_required:
+        confirm = input("\nConfirm? (y/n): ").strip().lower()
+        if confirm != 'y':
+            print("Aborted by user.")
+            return None
 
     # Return config dictionary
     return {

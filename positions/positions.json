@@ -1,0 +1,49 @@
+[
+  {
+    "symbol": "MSFT",
+    "timeframe": "1d",
+    "entry_date": "2025-03-05",
+    "entry_price": 400.00,
+    "position_size": 0.1,
+    "side": "long"
+  },
+  {"symbol": "F",
+    "timeframe": "1d",
+    "entry_date": "2025-02-28",
+    "entry_price": 9.64,
+    "position_size": 0.1,
+    "side": "long"
+  },
+  {
+    "symbol": "AAPL",
+    "timeframe": "1d",
+    "entry_date": "2025-02-21",
+    "entry_price": 249.59,
+    "position_size": 0.3,
+    "side": "long"
+  },
+  {
+    "symbol": "TSLA",
+    "timeframe": "1d",
+    "entry_date": "2025-03-25",
+    "entry_price": 282.94,
+    "position_size": 0.4,
+    "side": "long"
+  },
+  {
+    "symbol": "ORCL",
+    "timeframe": "1d",
+    "entry_date": "2025-02-18",
+    "entry_price": 179.65,
+    "position_size": 0.3,
+    "side": "long"
+  },
+  {
+    "symbol": "META",
+    "timeframe": "1d",
+    "entry_date": "2025-03-25",
+    "entry_price": 632.10,
+    "position_size": 0.3,
+    "side": "long"
+  }
+]

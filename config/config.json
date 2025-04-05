@@ -1,4 +1,10 @@
 {
+  "scan_symbols": ["DIS", "GOOG", "META", "NFLX", "SNAP", "VZ", "AMZN", "F", 
+		  "GM", "MCD", "NKE", "TSLA", "KO", "PG", "TAP", "WMT", "CVX",
+		  "SUB", "XOM", "BAC", "C", "JPM", "V", "JNJ", "PFE", "UNH",
+		  "BA", "CAT", "RTX", "AAPL", "AMD", "HPQ", "IBM", "INTC", "MSFT",
+		  "NVDA", "ORCL", "CL=F", "GC=F", "SI=F", "PL=F", "HG=F", "PA=F",
+		  "BTC-USD"],
   "use_cli": true, 
   "default_symbol": "CL=F",
   "default_timeframe": "1d",
@@ -36,8 +42,8 @@
       "n_simulations": 500
 	    },
 
-  "risk_per_trade": 0.01,
-  "account_size": 50000,
+  "risk_per_trade": 0.001,
+  "account_size": 10000,
 
   "symbol": {
 	      "CL=F": {

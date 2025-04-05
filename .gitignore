@@ -26,6 +26,8 @@ Thumbs.db
 # Skip config .json file
 !config.json
 !/config/config.json
+!positions.json
+!/positions/positions.json
 
 # Data files (raw, processed, exports)
 *.csv
