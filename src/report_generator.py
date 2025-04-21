@@ -504,7 +504,7 @@ def generate_report(
     file_name = f"{symbol.replace('=','_')}_{timeframe}_{end_date}_report.txt"
     file_path = os.path.join(REPORTS_FOLDER, file_name)
 
-    with open(file_path, 'w') as file:
+    with open(file_path, 'w', encoding='utf-8') as file:
         file.write(report_content)
 
     print(f"[Info] Report saved to {file_path}")

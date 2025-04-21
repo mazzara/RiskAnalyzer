@@ -1,17 +1,30 @@
 {
-  "scan_symbols": ["DIS", "GOOG", "META", "NFLX", "SNAP", "VZ", "AMZN", "F", 
+  "run_symbol": {
+    "symbol": "EURUSD",
+    "timeframe": "15m",
+    "start_date": "2015-01-01",	
+    "end_date": "2025-04-21",
+    "source": "mt5"
+  },
+
+  "scan_symbols": [
+    "EURUSD", "BTCUSD"
+  ],
+  "scan_symbols-YFINANCE": ["DIS", "GOOG", "META", "NFLX", "SNAP", "VZ", "AMZN", "F", 
 		  "GM", "MCD", "NKE", "TSLA", "KO", "PG", "TAP", "WMT", "CVX",
 		  "SUB", "XOM", "BAC", "C", "JPM", "V", "JNJ", "PFE", "UNH",
 		  "BA", "CAT", "RTX", "AAPL", "AMD", "HPQ", "IBM", "INTC", "MSFT",
 		  "NVDA", "ORCL", "CL=F", "GC=F", "SI=F", "PL=F", "HG=F", "PA=F",
 		  "BTC-USD"],
+
   "use_cli": true, 
   "default_symbol": "CL=F",
   "default_timeframe": "1d",
   "return_column": "daily_return_%",
   "debug_mode": false,
-  "data_source": "yfinance",
+  "data_source": "mt5",
   "show_plots": false,
+
 
   "outlier_filtering": {
       "method": "combined",

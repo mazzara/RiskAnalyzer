@@ -1,6 +1,7 @@
 # ./RiskAnalyzer/main.py  
 from src.cli import prompt_user_inputs
-from src.data_fetcher import get_market_data 
+from src.data_fetcher import get_market_data as get_yfinance_data 
+from src.data_fetcher_agnostic import get_market_data as get_agnostic_data
 from src.statistical_analysis import run_statistical_analysis
 from src.filters import adaptive_outlier_filter
 from src.descriptive_analysis import descriptive_statistics_pipeline
@@ -28,6 +29,8 @@ parser = argparse.ArgumentParser(description="Run RiskAnalyzer in normal or scan
 parser.add_argument('--debug', action='store_true', help='Run in step-by-step debug mode')
 parser.add_argument('--scanner', action='store_true', help='Run scanner mode on predefined symbols')
 parser.add_argument('--positions', action='store_true', help='Analyze positions from config/positions.json')
+parser.add_argument('--no-prompt', action='store_true', help='Skip CLI prompts and use config.json only')
+parser.add_argument('--risk-explorer', action='store_true', help='Run risk explorer mode')
 args = parser.parse_args()
 
 with open("config/config.json") as f:
@@ -102,7 +105,15 @@ def run_analysis(config, position=None):
 
 
     # ==== Step 1: Fetch data
-    raw_data = get_market_data(symbol, start, end, interval)
+    # raw_data = get_market_data(symbol, start, end, interval)
+    # if raw_data.empty:
+    #     print("[Error] No data fetched. Exiting.")
+    #     raise ValueError(f"No data fetched for {symbol}")
+    # pause_step("Data Fetching")
+
+    # New data fetching agnostic
+    source = config.get("data_source") or settings.get("data_source", "yfinance")
+    raw_data = get_agnostic_data(source, symbol, start, end, interval)
     if raw_data.empty:
         print("[Error] No data fetched. Exiting.")
         raise ValueError(f"No data fetched for {symbol}")
@@ -425,12 +436,42 @@ if __name__ == '__main__':
         analyze_positions()
         exit()
 
-    # CLI interaction
-    config = prompt_user_inputs()
+    # # CLI interaction
+    # config = prompt_user_inputs()
+    #
+    # if config is None:
+    #     exit()
+    # run_analysis(config)
 
-    if config is None:
+    if args.risk_explorer:
+        from src.risk_explorer import risk_explorer_mode
+        risk_explorer_mode()
         exit()
-    run_analysis(config)
+
+    if args.no_prompt:
+        # Skip user prompts, use config.json settings
+        config = {
+            "symbol": settings.get("run_symbol",{}).get("symbol", "CL=F"),
+            "timeframe": settings.get("run_symbol",{}).get("default_timeframe", "1d"),
+            "start_date": settings.get("run_symbol",{}).get("default_start_date", "2015-01-01"),
+            "end_date": settings.get("run_symbol",{}).get("default_end_date", "2025-04-21")
+            # "source": settings.get("run_symbol",{}).get("source", "yfinance")
+        }
+
+        print("\n[Info] Running RiskAnalyzer with config from config.json:")
+        print(f"  Symbol    : {config['symbol']}")
+        print(f"  Timeframe : {config['timeframe']}")
+        print(f"  Start Date: {config['start_date']}")
+        print(f"  End Date  : {config['end_date']}")
+        print("")
+
+        run_analysis(config)
+    else:
+        # Normal interactive mode
+        config = prompt_user_inputs()
+        if config is None:
+            exit()
+        run_analysis(config)
 
 
 
