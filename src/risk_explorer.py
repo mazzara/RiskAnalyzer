@@ -10,6 +10,15 @@ from src.statistical_analysis import run_statistical_analysis
 from src.filters import adaptive_outlier_filter
 
 
+def sanity_check_last_closes(data, timeframe):
+    if len(data) < 9:
+        print(f"[Validation] {timeframe} - Not enough candles for validation (only {len(data)} candles).")
+        return
+    last_n = data['close'].tail(9)
+    mean_price = last_n.mean()
+    print(f"[Validation] {timeframe} last 9 closes avg: {mean_price:.4f}")
+
+
 def risk_explorer_mode():
     print("\n=== Running Risk Explorer Mode ===\n")
 
@@ -71,6 +80,9 @@ def risk_explorer_mode():
                     method="zscore",
                     z_thresh=3.0
                 )
+
+                # Sanity check
+                sanity_check_last_closes(raw_data, interval)
 
                 mean_return = raw_data['daily_return_%'].mean()
                 std_return = raw_data['daily_return_%'].std()

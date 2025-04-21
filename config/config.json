@@ -8,7 +8,7 @@
   },
 
   "scan_symbols": [
-    "EURUSD", "BTCUSD"
+    "EURUSD", "BTCUSD", "XAUUSD"
   ],
   "scan_symbols-YFINANCE": ["DIS", "GOOG", "META", "NFLX", "SNAP", "VZ", "AMZN", "F", 
 		  "GM", "MCD", "NKE", "TSLA", "KO", "PG", "TAP", "WMT", "CVX",
