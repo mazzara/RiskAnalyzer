@@ -87,11 +87,16 @@ def risk_explorer_mode():
                 mean_return = raw_data['daily_return_%'].mean()
                 std_return = raw_data['daily_return_%'].std()
                 mean_atr = raw_data['atr_14'].mean()
+                
+                mean_close = raw_data['close'].mean()
+                mean_atr_pct = (mean_atr / mean_close) * 100 if mean_close else None
 
                 report_lines.append(f"\nTimeframe: {interval.upper()}")
                 report_lines.append(f"- Mean Return       : {mean_return:.4f} %")
                 report_lines.append(f"- Std Dev Return    : {std_return:.4f} %")
                 report_lines.append(f"- Mean ATR (14)     : {mean_atr:.4f}")
+                report_lines.append(f"- Mean ATR %        : {mean_atr_pct:.4f} %")
+                report_lines.append(f"- Mean Close        : {mean_close:.4f}")
 
                 report_lines.append(f"- Sample Size       : {len(raw_data)} candles")
 
