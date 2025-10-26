@@ -14,15 +14,10 @@ from src.monte_carlo_v2 import monte_carlo_simulation_v2, plot_simulations, calc
 from src.trading_rules import determine_regime_strategy, determine_trade_signal
 from src.label_candlesticks import classify_candle, simple_candle_state
 from src.report_generator import generate_report, full_conditional_probability_lookup_full, full_conditional_probability_lookup_full_verbose
-# from src.analyze_positions import analyze_positions
 import argparse
 import json 
 import numpy as np
 
-# with open("config/config.json") as f:
-#     settings = json.load(f)
-# debug_mode = settings.get("debug_mode", False)
-#
 
 # CLI argument parser
 parser = argparse.ArgumentParser(description="Run RiskAnalyzer in normal or scanner mode.")
@@ -37,9 +32,6 @@ with open("config/config.json") as f:
     settings = json.load(f)
 debug_mode = settings.get("debug_mode", False)
 
-# debug_mode = args.debug
-# if args.debug:
-#     debug_mode = True
 
 debug_mode = args.debug or settings.get("debug_mode", False)
 

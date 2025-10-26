@@ -8,7 +8,12 @@
   },
 
   "scan_symbols": [
-    "EURUSD", "BTCUSD", "XAUUSD"
+    "EURUSD", "GBPUSD", "USDJPY",
+    "ETHUSD", "BTCUSD", 
+    "XAUUSD", 
+    "Crude-F", 
+    "Coffee", "Sugar", "Corn", "Soybeans",
+    "EUSTX50", "DAX", "FTSE", "SP500"
   ],
   "scan_symbols-YFINANCE": ["DIS", "GOOG", "META", "NFLX", "SNAP", "VZ", "AMZN", "F", 
 		  "GM", "MCD", "NKE", "TSLA", "KO", "PG", "TAP", "WMT", "CVX",
