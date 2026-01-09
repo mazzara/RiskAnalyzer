@@ -1,24 +1,32 @@
 # ./src/datasources/mt5_fetcher.py
 
 # ./src/datasources/mt5_fetcher.py
+try:
+    import MetaTrader5 as mt5
+except ImportError:
+    mt5 = None
+    print("[Warning] MetaTrader5 module not found. Running in non-MT5 mode.")
 
 import pandas as pd
-import MetaTrader5 as mt5
 from datetime import datetime
 from src.datasources import mt5_connect
 
-# Map generic interval names to MT5 timeframe constants
-INTERVAL_MAP = {
-    '1m': mt5.TIMEFRAME_M1,
-    '5m': mt5.TIMEFRAME_M5,
-    '15m': mt5.TIMEFRAME_M15,
-    '30m': mt5.TIMEFRAME_M30,
-    '1h': mt5.TIMEFRAME_H1,
-    '4h': mt5.TIMEFRAME_H4,
-    '1d': mt5.TIMEFRAME_D1,
-    '1w': mt5.TIMEFRAME_W1,
-    '1mo': mt5.TIMEFRAME_MN1,
-}
+# Build the map only if mt5 is available
+if mt5:
+    INTERVAL_MAP = {
+        '1m':  mt5.TIMEFRAME_M1,
+        '5m':  mt5.TIMEFRAME_M5,
+        '15m': mt5.TIMEFRAME_M15,
+        '30m': mt5.TIMEFRAME_M30,
+        '1h':  mt5.TIMEFRAME_H1,
+        '4h':  mt5.TIMEFRAME_H4,
+        '1d':  mt5.TIMEFRAME_D1,
+        '1w':  mt5.TIMEFRAME_W1,
+        '1mo': mt5.TIMEFRAME_MN1,
+    }
+else:
+    # Fallback stub so rest of code still works
+    INTERVAL_MAP = {}
 
 # Global connection flag
 MT5_CONNECTED = False

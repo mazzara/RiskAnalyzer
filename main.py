@@ -14,6 +14,7 @@ from src.monte_carlo_v2 import monte_carlo_simulation_v2, plot_simulations, calc
 from src.trading_rules import determine_regime_strategy, determine_trade_signal
 from src.label_candlesticks import classify_candle, simple_candle_state
 from src.report_generator import generate_report, full_conditional_probability_lookup_full, full_conditional_probability_lookup_full_verbose
+from src.logger_config import logger  
 import argparse
 import json 
 import numpy as np
@@ -31,7 +32,6 @@ args = parser.parse_args()
 with open("config/config.json") as f:
     settings = json.load(f)
 debug_mode = settings.get("debug_mode", False)
-
 
 debug_mode = args.debug or settings.get("debug_mode", False)
 
@@ -96,7 +96,7 @@ def run_analysis(config, position=None):
     print_verbose(verbose)
 
 
-    # ==== Step 1: Fetch data
+    # ==== Step 1: Fetch data ================================
     # raw_data = get_market_data(symbol, start, end, interval)
     # if raw_data.empty:
     #     print("[Error] No data fetched. Exiting.")
@@ -105,10 +105,17 @@ def run_analysis(config, position=None):
 
     # New data fetching agnostic
     source = config.get("data_source") or settings.get("data_source", "yfinance")
-    raw_data = get_agnostic_data(source, symbol, start, end, interval)
-    if raw_data.empty:
+    # raw_data = get_agnostic_data(source, symbol, start, end, interval)
+    try:
+        raw_data = get_agnostic_data(source, symbol, start, end, interval)
+    except ValueError as e:
+        logger.error(f"[1833:30:30 Error] Data fetching failed: {e}")
+        raise
+
+    if raw_data is None or raw_data.empty:
         print("[Error] No data fetched. Exiting.")
         raise ValueError(f"No data fetched for {symbol}")
+
     pause_step("Data Fetching")
 
     # ==== Step 2: Run statistical analysis

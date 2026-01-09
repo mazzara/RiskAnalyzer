@@ -1,10 +1,10 @@
 {
   "run_symbol": {
-    "symbol": "EURUSD",
+    "symbol": "CL=F",
     "timeframe": "15m",
-    "start_date": "2015-01-01",	
-    "end_date": "2025-04-21",
-    "source": "mt5"
+    "start_date": "2025-08-01",	
+    "end_date": "2025-10-21",
+    "source": "yfinance"
   },
 
   "scan_symbols": [
@@ -13,22 +13,60 @@
     "XAUUSD", 
     "Crude-F", 
     "Coffee", "Sugar", "Corn", "Soybeans",
-    "EUSTX50", "DAX", "FTSE", "SP500"
+    "EUSTX50", "DAX", "FTSE", "SP500", 
+
+    "DIS", "GOOG", "META", "NFLX", "SNAP", "VZ", "AMZN", "F", 
+		  "GM", "MCD", "NKE", "TSLA", "KO", "PG", "TAP", "WMT", "CVX",
+		  "SUB", "XOM", "BAC", "C", "JPM", "V", "JNJ", "PFE", "UNH",
+		  "BA", "CAT", "RTX", "AAPL", "AMD", "HPQ", "IBM", "INTC", "MSFT",
+		  "NVDA", "ORCL", "CL=F", "GC=F", "SI=F", "PL=F", "HG=F", "PA=F", "GF=F", "LE=F",
+		  "BTC-USD",
+
+		"SPY", "QQQ", "QQQI", "IWM", "DIA", 
+
+		"PLTR", "SQ", "PYPL", "COIN", "MSTR",
+
+		"XLU", "WM", "COST", "PEP",
+
+		"GS", "MS", "KRE", 
+
+		"NG=F", "ZC=F", "ZS=F", "OXY", "SLB",
+
+		"EEM", "EFA", "FXI", "EWZ",
+
+		"ETH-USD", "SOL-USD"
   ],
   "scan_symbols-YFINANCE": ["DIS", "GOOG", "META", "NFLX", "SNAP", "VZ", "AMZN", "F", 
 		  "GM", "MCD", "NKE", "TSLA", "KO", "PG", "TAP", "WMT", "CVX",
 		  "SUB", "XOM", "BAC", "C", "JPM", "V", "JNJ", "PFE", "UNH",
 		  "BA", "CAT", "RTX", "AAPL", "AMD", "HPQ", "IBM", "INTC", "MSFT",
-		  "NVDA", "ORCL", "CL=F", "GC=F", "SI=F", "PL=F", "HG=F", "PA=F",
-		  "BTC-USD"],
+		  "NVDA", "ORCL", "CL=F", "GC=F", "SI=F", "PL=F", "HG=F", "PA=F", "GF=F", "LE=F",
+		  "BTC-USD",
 
-  "use_cli": true, 
+		"SPY", "QQQ", "QQQI", "IWM", "DIA", 
+
+		"PLTR", "SQ", "PYPL", "COIN", "MSTR",
+
+		"XLU", "WM", "COST", "PEP",
+
+		"GS", "MS", "KRE", 
+
+		"NG=F", "ZC=F", "ZS=F", "OXY", "SLB",
+
+		"EEM", "EFA", "FXI", "EWZ",
+
+		"ETH-USD", "SOL-USD"
+
+  ],
+
+  "use_cli": false, 
   "default_symbol": "CL=F",
   "default_timeframe": "1d",
   "return_column": "daily_return_%",
-  "debug_mode": false,
-  "data_source": "mt5",
+  "debug_mode": true,
+  "data_source": "yfinance",
   "show_plots": false,
+  "fallback_on_429": false,
 
 
   "outlier_filtering": {

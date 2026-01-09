@@ -1,0 +1,121 @@
+[Warning] MetaTrader5 module not found. Running in non-MT5 mode.
+[Warning] MetaTrader5 module not found. Running in non-MT5 mode.
+
+=== SCANNER MODE ===
+Scanning symbols: EURUSD, GBPUSD, USDJPY, ETHUSD, BTCUSD, XAUUSD, Crude-F, Coffee, Sugar, Corn, Soybeans, EUSTX50, DAX, FTSE, SP500
+Timeframe: 1d
+End Date: 2026-01-08
+
+--- Running analysis for EURUSD ---
+
+=== Risk Analyzer CLI ===
+
+[Info] Running analysis for:
+Symbol     : EURUSD
+Timeframe  : 1d
+Date Range : 2016-01-08 to 2026-01-08
+[Verbose]  Symbol: EURUSD, Start: 2016-01-08, End: 2026-01-08, Timeframe: 1d
+[ERROR] Skipping EURUSD due to exception: [yfinance] Empty data for EURUSD 1d 2016-01-08->2026-01-08
+
+--- Running analysis for GBPUSD ---
+
+=== Risk Analyzer CLI ===
+
+[Info] Running analysis for:
+Symbol     : GBPUSD
+Timeframe  : 1d
+Date Range : 2016-01-08 to 2026-01-08
+[Verbose]  Symbol: GBPUSD, Start: 2016-01-08, End: 2026-01-08, Timeframe: 1d
+[ERROR] Skipping GBPUSD due to exception: [yfinance] Empty data for GBPUSD 1d 2016-01-08->2026-01-08
+
+--- Running analysis for USDJPY ---
+
+=== Risk Analyzer CLI ===
+
+[Info] Running analysis for:
+Symbol     : USDJPY
+Timeframe  : 1d
+Date Range : 2016-01-08 to 2026-01-08
+[Verbose]  Symbol: USDJPY, Start: 2016-01-08, End: 2026-01-08, Timeframe: 1d
+[ERROR] Skipping USDJPY due to exception: [yfinance] Empty data for USDJPY 1d 2016-01-08->2026-01-08
+
+--- Running analysis for ETHUSD ---
+
+=== Risk Analyzer CLI ===
+
+[Info] Running analysis for:
+Symbol     : ETHUSD
+Timeframe  : 1d
+Date Range : 2016-01-08 to 2026-01-08
+[Verbose]  Symbol: ETHUSD, Start: 2016-01-08, End: 2026-01-08, Timeframe: 1d
+[ERROR] Skipping ETHUSD due to exception: [yfinance] Empty data for ETHUSD 1d 2016-01-08->2026-01-08
+
+--- Running analysis for BTCUSD ---
+
+=== Risk Analyzer CLI ===
+
+[Info] Running analysis for:
+Symbol     : BTCUSD
+Timeframe  : 1d
+Date Range : 2016-01-08 to 2026-01-08
+[Verbose]  Symbol: BTCUSD, Start: 2016-01-08, End: 2026-01-08, Timeframe: 1d
+[ERROR] Skipping BTCUSD due to exception: [yfinance] Empty data for BTCUSD 1d 2016-01-08->2026-01-08
+
+--- Running analysis for XAUUSD ---
+
+=== Risk Analyzer CLI ===
+
+[Info] Running analysis for:
+Symbol     : XAUUSD
+Timeframe  : 1d
+Date Range : 2016-01-08 to 2026-01-08
+[Verbose]  Symbol: XAUUSD, Start: 2016-01-08, End: 2026-01-08, Timeframe: 1d
+[ERROR] Skipping XAUUSD due to exception: [yfinance] Empty data for XAUUSD 1d 2016-01-08->2026-01-08
+
+--- Running analysis for Crude-F ---
+
+=== Risk Analyzer CLI ===
+
+[Info] Running analysis for:
+Symbol     : Crude-F
+Timeframe  : 1d
+Date Range : 2016-01-08 to 2026-01-08
+[Verbose]  Symbol: Crude-F, Start: 2016-01-08, End: 2026-01-08, Timeframe: 1d
+[ERROR] Skipping Crude-F due to exception: [yfinance] Empty data for Crude-F 1d 2016-01-08->2026-01-08
+
+--- Running analysis for Coffee ---
+
+=== Risk Analyzer CLI ===
+
+[Info] Running analysis for:
+Symbol     : Coffee
+Timeframe  : 1d
+Date Range : 2016-01-08 to 2026-01-08
+[Verbose]  Symbol: Coffee, Start: 2016-01-08, End: 2026-01-08, Timeframe: 1d
+[ERROR] Skipping Coffee due to exception: [yfinance] Empty data for Coffee 1d 2016-01-08->2026-01-08
+
+--- Running analysis for Sugar ---
+
+=== Risk Analyzer CLI ===
+
+[Info] Running analysis for:
+Symbol     : Sugar
+Timeframe  : 1d
+Date Range : 2016-01-08 to 2026-01-08
+[Verbose]  Symbol: Sugar, Start: 2016-01-08, End: 2026-01-08, Timeframe: 1d
+[ERROR] Skipping Sugar due to exception: [yfinance] Empty data for Sugar 1d 2016-01-08->2026-01-08
+
+--- Running analysis for Corn ---
+
+=== Risk Analyzer CLI ===
+
+[Info] Running analysis for:
+Symbol     : Corn
+Timeframe  : 1d
+Date Range : 2016-01-08 to 2026-01-08
+[Verbose]  Symbol: Corn, Start: 2016-01-08, End: 2026-01-08, Timeframe: 1d
+
+[Paused] Step: Data Fetching complete. Press Enter to continue...[Info] Starting statistical feature engineering...
+[Info] Statistical feature engineering completed!
+
+[Paused] Step: Statistical Analysis - Raw Data (Pre-Filtering) complete. Press Enter to continue...

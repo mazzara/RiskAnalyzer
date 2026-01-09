@@ -1,10 +1,14 @@
-import MetaTrader5 as mt5
+try:
+    import MetaTrader5 as mt5
+except ImportError:
+    mt5 = None
+    print("[Warning] MetaTrader5 module not found. Running in non-MT5 mode.")
+
 import os
 
-
 MT5_BROKER_SERVER="mt5-demo01.pepperstone.com"
-MT5_BROKER_LOGIN=61342026
-MT5_BROKER_PASSWORD="@cTrader3DEMO"
+MT5_BROKER_LOGIN=61423868
+MT5_BROKER_PASSWORD="@DEMOcTrader3"
 
 
 def connect():
